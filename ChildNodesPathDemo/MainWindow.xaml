@@ -15,20 +15,13 @@
     <Grid>
         <dxg:TreeListControl x:Name="treeListView1" ItemsSource="{Binding DataItems}">
             <dxg:TreeListControl.View>
-                <dxg:TreeListView  TreeDerivationMode="ChildNodesSelector" ChildNodesPath="Tasks" ImageFieldName="Image" ShowNodeImages="True" UseEvenRowBackground="True" BandCellSeparatorColor="#FFC52626" BandHeaderSeparatorColor="#FF2EBDB0" AlternateRowBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}, ElementName=colorEdit}" />
+                <dxg:TreeListView  TreeDerivationMode="ChildNodesSelector" ChildNodesPath="SubNode" ImageFieldName="Image" ShowNodeImages="True" UseEvenRowBackground="True" BandCellSeparatorColor="#FFC52626" BandHeaderSeparatorColor="#FF2EBDB0" AlternateRowBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}, ElementName=colorEdit}" />
             </dxg:TreeListControl.View>
             <dxg:TreeListColumn FieldName="Name" AllowSorting="True" />
             <dxg:TreeListColumn FieldName="Executor" AllowSorting="True" />
             <dxg:TreeListColumn FieldName="State" AllowSorting="True" />
          
         </dxg:TreeListControl>
-        <dxe:ColorEdit x:Name="colorEdit" HorizontalAlignment="Left" Height="Auto" Margin="325,86,0,0" VerticalAlignment="Top" Width="Auto" ToolTipColorDisplayFormat="ARGB" NoColorButtonContent="kkkkk" ChipSize="Small" Foreground="#FFDE3838">
-            <dxe:ColorEdit.EditCore>
-                <dxcv:DocumentView/>
-            </dxe:ColorEdit.EditCore>
-        </dxe:ColorEdit>
-        <dxe:PopupColorEdit HorizontalAlignment="Left" Margin="103,183,0,0" VerticalAlignment="Top" Width="150"/>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="72,124,0,0" VerticalAlignment="Top" Width="75" Foreground="{Binding Color, Converter={StaticResource ColorToBrushConverter}, ElementName=colorEdit}"/>
 
     </Grid>
 </Window>

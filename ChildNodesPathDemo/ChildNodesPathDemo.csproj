@@ -140,5 +140,14 @@
   <ItemGroup>
     <Resource Include="Resources\_Folder.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\12_Сенсорная техника, выключатель и кнопочный переключатель.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\6_Защитные устройства.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\5_Преобразователи.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
