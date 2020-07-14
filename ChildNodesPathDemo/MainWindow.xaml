@@ -2,8 +2,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-         xmlns:local="clr-namespace:ChildNodesPathDemo"
-        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dxcv="http://schemas.devexpress.com/winfx/2008/xaml/codeview" xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" x:Class="ChildNodesPathDemo.MainWindow"
+        xmlns:local="clr-namespace:ChildNodesPathDemo"
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
+        xmlns:dxcv="http://schemas.devexpress.com/winfx/2008/xaml/codeview" 
+        xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
+        x:Class="ChildNodesPathDemo.MainWindow"
         mc:Ignorable="d"
         Title="ChildNodesPathDemo" Height="350" Width="525">
     <Window.Resources>
@@ -13,15 +16,31 @@
         <local:ViewModel/>
     </Window.DataContext>
     <Grid>
-        <dxg:TreeListControl x:Name="treeListView1" ItemsSource="{Binding DataItems}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        
+        <dxg:TreeListControl x:Name="treeListView1" ItemsSource="{Binding DataItems}" Grid.Column="0">
             <dxg:TreeListControl.View>
                 <dxg:TreeListView  TreeDerivationMode="ChildNodesSelector" ChildNodesPath="SubNode" ImageFieldName="Image" ShowNodeImages="True" UseEvenRowBackground="True" BandCellSeparatorColor="#FFC52626" BandHeaderSeparatorColor="#FF2EBDB0" AlternateRowBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}, ElementName=colorEdit}" />
             </dxg:TreeListControl.View>
             <dxg:TreeListColumn FieldName="Name" AllowSorting="True" />
-            <dxg:TreeListColumn FieldName="Executor" AllowSorting="True" />
-            <dxg:TreeListColumn FieldName="State" AllowSorting="True" />
+            <dxg:TreeListColumn FieldName="Description" AllowSorting="True" />
+            <dxg:TreeListColumn FieldName="WHD" AllowSorting="True" />
          
         </dxg:TreeListControl>
+
+        <dxg:TreeListControl x:Name="treeListView2" ItemsSource="{Binding DataItems}" Grid.Column="1">
+            <dxg:TreeListControl.View>
+                <dxg:TreeListView  TreeDerivationMode="ChildNodesSelector" ChildNodesPath="SubNode" ImageFieldName="Image" ShowNodeImages="True" UseEvenRowBackground="True" BandCellSeparatorColor="#FFC52626" BandHeaderSeparatorColor="#FF2EBDB0" AlternateRowBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}, ElementName=colorEdit}" />
+            </dxg:TreeListControl.View>
+            <dxg:TreeListColumn FieldName="Name" AllowSorting="True" />
+            <dxg:TreeListColumn FieldName="Description" AllowSorting="True" />
+            <dxg:TreeListColumn FieldName="WHD" AllowSorting="True" />
+
+        </dxg:TreeListControl>
+
 
     </Grid>
 </Window>

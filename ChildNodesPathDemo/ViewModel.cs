@@ -104,10 +104,13 @@ namespace ChildNodesPathDemo
     public class ViewModel
     {
         public ObservableCollection<ProjectObject> DataItems { get; set; }
+        public ObservableCollection<ProjectObject> DataItems2 { get; set; }
+
 
         public ViewModel()
         {
             DataItems = InitData();
+           // DataItems2 =InitData2();
         }
 
         private ObservableCollection<ProjectObject> InitData()
@@ -143,7 +146,7 @@ namespace ChildNodesPathDemo
             #region Подключение к БД, SQL запрос и сохранение в dataset
 
             // либо создадим эту строку сами напрямую
-            string connectionString = @"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\ESS_part002.mdb";
+            string connectionString = @"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\База_Изделий.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\ESS_part005_ONLY_ABB.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\ESS_part002.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=F:\Project KP\ESS_part002.mdb";
