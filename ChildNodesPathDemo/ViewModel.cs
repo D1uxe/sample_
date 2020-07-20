@@ -1,10 +1,15 @@
-﻿using DevExpress.XtraRichEdit.Commands.Internal;
+﻿using DevExpress.ClipboardSource.SpreadsheetML;
+using DevExpress.Xpf.Grid;
+using DevExpress.XtraRichEdit.Commands.Internal;
+using DevExpress.XtraRichEdit.Model.History;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data;
 using System.Data.OleDb;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -101,17 +106,63 @@ namespace ChildNodesPathDemo
     }
 
 
-    public class ViewModel
+    public class ViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<ProjectObject> DataItems { get; set; }
-        public ObservableCollection<ProjectObject> DataItems2 { get; set; }
+
+        private string _Test="ПРИВЯЗКА";
+        public string Test
+        {
+            get { return _Test; }
+            set
+            {
+                if (Equals(_Test, value)) return;
+                _Test = value;
+                OnPropertyCnaged();
+            }
+        }
+
+        private TreeListNode _SelectedNode;
+        public TreeListNode SelectedNode
+        {
+            get { return _SelectedNode; }
+            set
+            {
+                if (Equals(_SelectedNode, value)) return;
+                _SelectedNode = value;
+                OnPropertyCnaged();
+            }
+        }
+
 
 
         public ViewModel()
         {
             DataItems = InitData();
-           // DataItems2 =InitData2();
+            
+            
         }
+
+        public void Foo()
+        {
+            DataItems.Add(new ProjectObject() { Name = "JJJJJ", SubNode = new ObservableCollection<ProjectObject>() });
+            MessageBox.Show(DataItems[0].SubNode[0].SubNode[0].Name);
+            
+            //DataItems[0].SubNode[0].Name;
+            //DataItems[0].SubNode[0].SubNode[0].Name;
+
+            
+        }
+
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyCnaged([CallerMemberName] string PropertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(PropertyName));
+        }
+
+
 
         private ObservableCollection<ProjectObject> InitData()
         {
@@ -122,7 +173,7 @@ namespace ChildNodesPathDemo
 
 
             //projects.Add(Project);
-
+           
 
             return projects;
         }
@@ -146,7 +197,7 @@ namespace ChildNodesPathDemo
             #region Подключение к БД, SQL запрос и сохранение в dataset
 
             // либо создадим эту строку сами напрямую
-            string connectionString = @"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\База_Изделий.mdb";
+            string connectionString = @"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\ESS_part002.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\ESS_part005_ONLY_ABB.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\ESS_part002.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=F:\Project KP\ESS_part002.mdb";
@@ -237,7 +288,7 @@ namespace ChildNodesPathDemo
             {
                 MessageBox.Show(ex.Message);
             }
-            
+
              */
             #endregion
 
@@ -288,7 +339,7 @@ namespace ChildNodesPathDemo
             List<string> Description2Name = seq.Select(s => s.Field<string>("description2")).ToList();
             List<string> Description3Name = seq.Select(s => s.Field<string>("description3")).ToList();
             List<string> PartNrName = seq.Select(s => s.Field<string>("partnr")).ToList();
-
+            List<string> NoteName = seq.Select(s => s.Field<string>("note")).ToList();
 
             ObservableCollection<ProjectObject> ProductTopGroupNode = Project;
             // ObservableCollection<ProjectObject> SupplierNode = new ObservableCollection<ProjectObject>();
@@ -367,7 +418,7 @@ namespace ChildNodesPathDemo
                 j = find_index_in_collection(PartNrNode, PartNrName[i]);
                 if (j < 0)
                 {
-                    PartNrNode.Add(new ProjectObject() { Name = PartNrName[i] });
+                    PartNrNode.Add(new ProjectObject() { Name = PartNrName[i], Executor = NoteName[i] });
                     j = PartNrNode.Count - 1;
                 }
             }
