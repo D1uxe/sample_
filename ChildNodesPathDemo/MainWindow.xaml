@@ -16,11 +16,12 @@
         <Style x:Key="Style1">
             <Setter Property="Control.Background" Value="Yellow"/>
         </Style>
-
     </Window.Resources>
+    
     <Window.DataContext>
         <local:ViewModel/>
     </Window.DataContext>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

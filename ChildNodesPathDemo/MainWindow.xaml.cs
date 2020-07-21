@@ -9,9 +9,11 @@ namespace ChildNodesPathDemo
     /// </summary>
     public partial class MainWindow : Window
     {
+       // ViewModel vm = new ViewModel();
         public MainWindow()
         {
             InitializeComponent();
+           // this.DataContext = vm;
         }
 
         private void TreeListView_StartRecordDrag(object sender, DevExpress.Xpf.Core.StartRecordDragEventArgs e)
@@ -98,7 +100,8 @@ namespace ChildNodesPathDemo
 
         private void TreeListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-             ((ViewModel)this.DataContext).Foo();
+            ((ViewModel)this.DataContext).Foo();
+            
 
         }
     }
