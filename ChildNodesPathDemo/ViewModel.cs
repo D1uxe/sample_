@@ -1,7 +1,4 @@
-﻿using DevExpress.ClipboardSource.SpreadsheetML;
-using DevExpress.Xpf.Grid;
-using DevExpress.XtraRichEdit.Commands.Internal;
-using DevExpress.XtraRichEdit.Model.History;
+﻿using DevExpress.Xpf.Grid;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -110,7 +107,7 @@ namespace ChildNodesPathDemo
     {
         public ObservableCollection<ProjectObject> DataItems { get; set; }
 
-        private string _Test="ПРИВЯЗКА";
+        private string _Test = "ПРИВЯЗКА";
         public string Test
         {
             get { return _Test; }
@@ -122,36 +119,57 @@ namespace ChildNodesPathDemo
             }
         }
 
-        private TreeListNode _SelectedNode;
-        public TreeListNode SelectedNode
+
+        #region SelectedNode2 : TreeListNode - выделенный узел второго деерева
+        private TreeListNode _SelectedNode2;
+        public TreeListNode SelectedNode2
         {
-            get { return _SelectedNode; }
+            get { return _SelectedNode2; }
             set
             {
-                if (Equals(_SelectedNode, value)) return;
-                _SelectedNode = value;
+                if (Equals(_SelectedNode2, value)) return;
+                _SelectedNode2 = value;
                 OnPropertyCnaged();
             }
         }
+        #endregion
+
+
+        #region SelectedNode1 : TreeListNode - выделенный узел первого деерева
+        private TreeListNode _SelectedNode1;
+        public TreeListNode SelectedNode1
+        {
+            get { return _SelectedNode1; }
+            set
+            {
+                if (Equals(_SelectedNode1, value)) return;
+                _SelectedNode1 = value;
+                OnPropertyCnaged();
+            }
+        }
+        #endregion
 
 
 
         public ViewModel()
         {
             DataItems = InitData();
-            
-            
+
+
         }
 
         public void Foo()
         {
-            DataItems.Add(new ProjectObject() { Name = "JJJJJ", SubNode = new ObservableCollection<ProjectObject>() });
-            MessageBox.Show(DataItems[0].SubNode[0].SubNode[0].Name);
-            
-            //DataItems[0].SubNode[0].Name;
-            //DataItems[0].SubNode[0].SubNode[0].Name;
 
-            
+            ProjectObject result2 = DataItems.Flatten(i => i.SubNode).
+                                             FirstOrDefault(i => i.Name == ((ProjectObject)SelectedNode2?.Content)?.Name);
+
+            if (result2.SubNode != null)
+            {
+                result2.SubNode.Add((ProjectObject)SelectedNode1.Content);
+            }
+            else MessageBox.Show("Сюда класть нихуя нельзя!");
+
         }
 
 
@@ -173,7 +191,7 @@ namespace ChildNodesPathDemo
 
 
             //projects.Add(Project);
-           
+
 
             return projects;
         }
