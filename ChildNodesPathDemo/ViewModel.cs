@@ -85,12 +85,15 @@ namespace ChildNodesPathDemo
 
         public string OriginName { get; private set; }
         public string Executor { get; set; }
-
+        private static int Id { get;  set; }
+        public int NodeId { get;  private set; }
         public override string ToString() { return Name; }
 
         protected BitmapImage StaticImage;
         public BaseObject()
         {
+            Id++;
+            NodeId = Id;
             //StaticImage = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
         }
         public BitmapImage Image { get { return StaticImage; } }
@@ -98,7 +101,10 @@ namespace ChildNodesPathDemo
 
     public class ProjectObject : BaseObject
     {
+
         public ObservableCollection<ProjectObject> SubNode { get; set; }
+
+        
 
     }
 
@@ -162,7 +168,7 @@ namespace ChildNodesPathDemo
         {
 
             ProjectObject result2 = DataItems.Flatten(i => i.SubNode).
-                                             FirstOrDefault(i => i.Name == ((ProjectObject)SelectedNode2?.Content)?.Name);
+                                              FirstOrDefault(i => (i.Name == ((ProjectObject)SelectedNode2?.Content)?.Name && i.NodeId == ((ProjectObject)SelectedNode2?.Content)?.NodeId));
 
             if (result2.SubNode != null)
             {
@@ -171,6 +177,21 @@ namespace ChildNodesPathDemo
             else MessageBox.Show("Сюда класть нихуя нельзя!");
 
         }
+
+
+
+        public string Foo2()
+        {
+
+            ProjectObject result2 = DataItems.Flatten(i => i.SubNode).
+                                              FirstOrDefault(i => i.Name == ((ProjectObject)SelectedNode2?.Content)?.Name);
+
+            return result2.NodeId.ToString();
+
+           // MessageBox.Show(result2.NodeId.ToString());
+
+        }
+
 
 
 
@@ -215,7 +236,7 @@ namespace ChildNodesPathDemo
             #region Подключение к БД, SQL запрос и сохранение в dataset
 
             // либо создадим эту строку сами напрямую
-            string connectionString = @"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\ESS_part002.mdb";
+            string connectionString = @"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\База_Изделий.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\ESS_part005_ONLY_ABB.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\ESS_part002.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=F:\Project KP\ESS_part002.mdb";
@@ -379,7 +400,7 @@ namespace ChildNodesPathDemo
                 //если не нашли эл-т с таким именем, то добавляем его в конец и запоминаем индекс добавленного
                 if (j < 0)
                 {
-                    ProductTopGroupNode.Add(new ProjectObject() { Name = string_ProductTopGroupName, SubNode = new ObservableCollection<ProjectObject>() });
+                    ProductTopGroupNode.Add(new ProjectObject() { Name = string_ProductTopGroupName,  SubNode = new ObservableCollection<ProjectObject>() });
                     j = ProductTopGroupNode.Count - 1; // индекс последнего добавленного элемента. Т.к. метод Add добавляет в конец коллекции
                 }
                 //переходим вниз по дереву к следующей группе элементов в ту ветвь, в которую зашли выше

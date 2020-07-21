@@ -1,5 +1,7 @@
 ﻿using DevExpress.Xpf.Core;
+using DevExpress.Xpf.Editors.Helpers;
 using DevExpress.Xpf.Grid;
+using System.Linq;
 using System.Windows;
 
 namespace ChildNodesPathDemo
@@ -89,13 +91,15 @@ namespace ChildNodesPathDemo
 
             //свойство Content выделенного узла содержит ProjectObject со всеми свойствами.
             // this.Title = ((ProjectObject)((TreeListView)sender).FocusedNode.Content).Executor ?? "Null";
-            this.Title = ((TreeListView)sender).FocusedNode.Id.ToString();
-            
+           
+            this.Title = ((TreeListView)sender).FocusedNode.Id.ToString()+"     "+ ((ViewModel)this.DataContext).Foo2(); 
+
         }
 
         private void TreeListView_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-           // ((ViewModel)this.DataContext).Foo();
+             //((ViewModel)this.DataContext).Foo2();
+            
         }
 
         private void TreeListView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
