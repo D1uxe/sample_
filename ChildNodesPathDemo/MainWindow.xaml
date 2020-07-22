@@ -46,7 +46,8 @@
                                    AllowDragDrop="True"
                                    StartRecordDrag="TreeListView_StartRecordDrag"
                                    MouseDoubleClick="TreeListView_MouseDoubleClick"
-                                   FocusedNode="{Binding SelectedNode1, Mode=OneWayToSource}"/>
+                                   FocusedNode="{Binding SelectedNode1, Mode=OneWayToSource}" 
+                                   ExpandCollapseNodesOnNavigation="True" />
                 
             </dxg:TreeListControl.View>
             <dxg:TreeListColumn FieldName="Name" AllowSorting="True" />
@@ -72,7 +73,8 @@
                                    MouseDown="TreeListView_MouseDown"
                                    ShowFocusedRectangle="True"
                                    HighlightItemOnHover="True"
-                                   FocusedNode="{Binding SelectedNode2, Mode=OneWayToSource}"/>
+                                   FocusedNode="{Binding SelectedNode2, Mode=OneWayToSource}" 
+                                   ExpandCollapseNodesOnNavigation="True"/>
                                   
                
             </dxg:TreeListControl.View>
