@@ -2,10 +2,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
         xmlns:local="clr-namespace:ChildNodesPathDemo"
         xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-        xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
+        xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
         x:Class="ChildNodesPathDemo.MainWindow"
         
         Title="ChildNodesPathDemo" Height="600" Width="1200">
@@ -17,11 +18,11 @@
             <Setter Property="Control.Background" Value="Yellow"/>
         </Style>
     </Window.Resources>
-    
+
     <Window.DataContext>
         <local:ViewModel/>
     </Window.DataContext>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -49,17 +50,17 @@
                                    MouseDoubleClick="TreeListView_MouseDoubleClick"
                                    FocusedNode="{Binding SelectedNode1, Mode=OneWayToSource}" 
                                    ExpandCollapseNodesOnNavigation="True" />
-                
+
             </dxg:TreeListControl.View>
             <dxg:TreeListColumn FieldName="Name" AllowSorting="True" />
             <dxg:TreeListColumn FieldName="Executor" AllowSorting="True" />
             <dxg:TreeListColumn FieldName="WHD" AllowSorting="True" />
 
-            
+
 
         </dxg:TreeListControl>
 
-        
+
 
         <dxg:TreeListControl x:Name="treeListView2" ItemsSource="{Binding DataItems}" Grid.Column="1">
             <dxg:TreeListControl.InputBindings>
@@ -78,14 +79,25 @@
                                    ShowFocusedRectangle="True"
                                    HighlightItemOnHover="True"
                                    FocusedNode="{Binding SelectedNode2, Mode=OneWayToSource}" 
-                                   ExpandCollapseNodesOnNavigation="True"
+                                   ExpandCollapseNodesOnNavigation="True" 
                                    />
-                
+
 
             </dxg:TreeListControl.View>
+
+            <dxg:TreeListColumn FieldName="Name" AllowSorting="True"/>
+            <dxg:TreeListColumn FieldName="Executor" AllowSorting="True"/>
+            <!--<dxg:TreeListColumn.CellTemplate>
+                    <DataTemplate>
+                        <ComboBox x:Name="Boxxx" >
+                            <System:String>First</System:String>
+                            <System:String>Second</System:String>
+                            <System:String>Third</System:String>
+                        </ComboBox>
+                    </DataTemplate>
+                </dxg:TreeListColumn.CellTemplate>
+            </dxg:TreeListColumn>-->
             
-            <dxg:TreeListColumn FieldName="Name" AllowSorting="True" />
-            <dxg:TreeListColumn FieldName="Executor" AllowSorting="True" />
             <dxg:TreeListColumn FieldName="WHD" AllowSorting="True" />
 
         </dxg:TreeListControl>
