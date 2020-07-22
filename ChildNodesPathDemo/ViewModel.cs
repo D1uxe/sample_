@@ -168,11 +168,18 @@ namespace ChildNodesPathDemo
         {
 
             ProjectObject result2 = DataItems.Flatten(i => i.SubNode).
-                                              FirstOrDefault(i => (i.Name == ((ProjectObject)SelectedNode2?.Content)?.Name && i.NodeId == ((ProjectObject)SelectedNode2?.Content)?.NodeId));
+                                              FirstOrDefault(i => (/*i.Name == ((ProjectObject)SelectedNode2?.Content)?.Name && */
+                                                                   i.NodeId == ((ProjectObject)SelectedNode2?.Content)?.NodeId));
 
+            if (SelectedNode1==null)
+            {
+                SelectedNode2.IsExpanded = true;
+            }
+
+                
             if (result2.SubNode != null)
             {
-                result2.SubNode.Add((ProjectObject)SelectedNode1.Content);
+                result2.SubNode.Add((ProjectObject)SelectedNode1?.Content);
             }
             else MessageBox.Show("Сюда класть нихуя нельзя!");
 
