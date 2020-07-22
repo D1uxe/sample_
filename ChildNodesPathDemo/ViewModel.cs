@@ -171,7 +171,7 @@ namespace ChildNodesPathDemo
                                               FirstOrDefault(i => (/*i.Name == ((ProjectObject)SelectedNode2?.Content)?.Name && */
                                                                    i.NodeId == ((ProjectObject)SelectedNode2?.Content)?.NodeId));
 
-            if (SelectedNode1==null)
+            if (SelectedNode1!=null)
             {
                 SelectedNode2.IsExpanded = true;
             }

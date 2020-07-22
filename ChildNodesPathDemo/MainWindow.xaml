@@ -2,12 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
         xmlns:local="clr-namespace:ChildNodesPathDemo"
-        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" 
-        xmlns:dxcv="http://schemas.devexpress.com/winfx/2008/xaml/codeview" 
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm" 
         x:Class="ChildNodesPathDemo.MainWindow"
-        mc:Ignorable="d"
+        
         Title="ChildNodesPathDemo" Height="600" Width="1200">
     <Window.Resources>
         <dxmvvm:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
@@ -44,6 +44,7 @@
                                    BandHeaderSeparatorColor="#FF2EBDB0" 
                                    AlternateRowBackground="{Binding Color, Converter={StaticResource ColorToBrushConverter}, ElementName=colorEdit}" 
                                    AllowDragDrop="True"
+                                   HighlightItemOnHover="True"
                                    StartRecordDrag="TreeListView_StartRecordDrag"
                                    MouseDoubleClick="TreeListView_MouseDoubleClick"
                                    FocusedNode="{Binding SelectedNode1, Mode=OneWayToSource}" 
@@ -61,6 +62,9 @@
         
 
         <dxg:TreeListControl x:Name="treeListView2" ItemsSource="{Binding DataItems}" Grid.Column="1">
+            <dxg:TreeListControl.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" Command=""/>
+            </dxg:TreeListControl.InputBindings>
             <dxg:TreeListControl.View>
                 <dxg:TreeListView  TreeDerivationMode="ChildNodesSelector" 
                                    ChildNodesPath="SubNode" 
@@ -74,9 +78,10 @@
                                    ShowFocusedRectangle="True"
                                    HighlightItemOnHover="True"
                                    FocusedNode="{Binding SelectedNode2, Mode=OneWayToSource}" 
-                                   ExpandCollapseNodesOnNavigation="True"/>
-                                  
-               
+                                   ExpandCollapseNodesOnNavigation="True"
+                                   />
+                
+
             </dxg:TreeListControl.View>
             
             <dxg:TreeListColumn FieldName="Name" AllowSorting="True" />
@@ -85,7 +90,7 @@
 
         </dxg:TreeListControl>
 
-        <TextBlock Text="{Binding SelectedNode1.Content}"  Grid.Column="2" FontSize="15" Padding="85"/>
+        <TextBlock Text="{Binding SelectedNode1.Content}"  Grid.Column="2" FontSize="15" Padding="85" />
         <TextBlock Text="{Binding SelectedNode2.Content}"  Grid.Column="2" FontSize="24" Padding="15"/>
 
 
