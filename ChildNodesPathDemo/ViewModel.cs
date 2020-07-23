@@ -125,6 +125,21 @@ namespace ChildNodesPathDemo
             }
         }
 
+        
+        
+        #region SelectedNode1 : TreeListNode - выделенный узел первого деерева
+        private TreeListNode _SelectedNode1;
+        public TreeListNode SelectedNode1
+        {
+            get { return _SelectedNode1; }
+            set
+            {
+                if (Equals(_SelectedNode1, value)) return;
+                _SelectedNode1 = value;
+                OnPropertyCnaged();
+            }
+        }
+        #endregion
 
         #region SelectedNode2 : TreeListNode - выделенный узел второго деерева
         private TreeListNode _SelectedNode2;
@@ -141,19 +156,6 @@ namespace ChildNodesPathDemo
         #endregion
 
 
-        #region SelectedNode1 : TreeListNode - выделенный узел первого деерева
-        private TreeListNode _SelectedNode1;
-        public TreeListNode SelectedNode1
-        {
-            get { return _SelectedNode1; }
-            set
-            {
-                if (Equals(_SelectedNode1, value)) return;
-                _SelectedNode1 = value;
-                OnPropertyCnaged();
-            }
-        }
-        #endregion
 
 
 
@@ -243,9 +245,9 @@ namespace ChildNodesPathDemo
             #region Подключение к БД, SQL запрос и сохранение в dataset
 
             // либо создадим эту строку сами напрямую
-            string connectionString = @"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\База_Изделий.mdb";
-            //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\ESS_part005_ONLY_ABB.mdb";
-            //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\source\repos\WpfApp1\ESS_part002.mdb";
+            string connectionString = @"Provider=Microsoft.JET.OLEDB.4.0; Data Source=..\..\db\База_Изделий.mdb";
+            //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=..\..\db\ESS_part005_ONLY_ABB.mdb";
+            //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=..\..\db\ESS_part002.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=F:\Project KP\ESS_part002.mdb";
             //База_Изделий.mdb
 
