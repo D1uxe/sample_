@@ -12,7 +12,7 @@ namespace ChildNodesPathDemo
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!(value is TreeListNode Node)) return null;
-            return ((ProjectObject)Node.Content).Executor ?? "NULL";
+            return ((EplanNode)Node.Content).Executor ?? "NULL";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

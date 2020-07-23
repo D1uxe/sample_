@@ -82,6 +82,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Extension.cs" />
+    <Compile Include="Model\ArticleNode.cs" />
+    <Compile Include="Model\BaseNode.cs" />
+    <Compile Include="Model\CabinetNode.cs" />
+    <Compile Include="Model\ProjectNode.cs" />
+    <Compile Include="Model\SetNode.cs" />
+    <Compile Include="Model\SubsystemNode.cs" />
     <Compile Include="MyConverter.cs" />
     <Compile Include="ViewModel.cs" />
     <Page Include="MainWindow.xaml">
@@ -150,5 +156,6 @@
   <ItemGroup>
     <Resource Include="Resources\5_Преобразователи.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

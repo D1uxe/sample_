@@ -22,14 +22,14 @@ namespace ChildNodesPathDemo
         {
             var data = (RecordDragDropData)e.Data.GetData(typeof(RecordDragDropData));
 
-            if (((ProjectObject)data.Records[0]).Executor == null)
+            if (((EplanNode)data.Records[0]).Executor == null)
             {
                 e.AllowDrag = false;
                 e.Handled = true;
             }
 
 
-            //foreach (ProjectObject po in data.Records)
+            //foreach (EplanNode po in data.Records)
             //{
             //    this.Title = po.Executor;
             //}
@@ -89,8 +89,8 @@ namespace ChildNodesPathDemo
             //}
 
 
-            //свойство Content выделенного узла содержит ProjectObject со всеми свойствами.
-            // this.Title = ((ProjectObject)((TreeListView)sender).FocusedNode.Content).Executor ?? "Null";
+            //свойство Content выделенного узла содержит EplanNode со всеми свойствами.
+            // this.Title = ((EplanNode)((TreeListView)sender).FocusedNode.Content).Executor ?? "Null";
            
             this.Title = ((TreeListView)sender).FocusedNode.Id.ToString()+"     "+ ((ViewModel)this.DataContext).Foo2(); 
 

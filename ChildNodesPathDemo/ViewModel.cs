@@ -26,17 +26,46 @@ using System.Windows.Media.Imaging;
      * Показ всех снипетов Ctr+K,X
      * Закоментировать выбранные линии Ctr+E,C;  раскомментировать Ctr+E,U
      * Окружить выделенный текст  Ctr+K,S
-     * Дублировать строку Ctr+E,V
+     * Дублировать строку Ctr+E,V вставляет выше
      * Быстрые действия Ctr+.
      * Несколько точек вставки Ctr+ALT+нажатие
      * Выбор блока ALT и тащим мышь или SHIFT+ALT+стрелки
      * Удалить все точки останова Ctrl+Shift+F9
-     * 
-     */
+     Рефакторинг:
+     * Ctrl+R, Ctrl+M(комбинация) — выделение метода
+     * Ctrl+R, Ctrl+E(комбинация) — инкапсуляция свойства
+     * Ctrl+R, Ctrl+I(комбинация) — выделение интерфейса
+     * Ctrl+R, Ctrl+V(комбинация) — удаление параметра
+     * Ctrl+R, Ctrl+O(комбинация) — изменить порядок параметров
+
+ */
+
+/* МОДИФИКАТОРЫ ДОСТУПА
+ 
+    * public: публичный, общедоступный класс или член класса. Такой член класса доступен из любого места в коде, а также из других программ и сборок.
+     
+    * private: закрытый класс или член класса. Представляет полную противоположность модификатору public. 
+               Такой закрытый класс или член класса доступен только из кода в том же классе или контексте.
+
+    * protected: такой член класса доступен из любого места в текущем классе или в производных классах. 
+    *            При этом производные классы могут располагаться в других сборках.
+                
+    * internal: класс и члены класса с подобным модификатором доступны из любого места кода в той же сборке, 
+    *           однако он недоступен для других программ и сборок (как в случае с модификатором public).
+               
+    * protected internal: совмещает функционал двух модификаторов. 
+    *                     Классы и члены класса с таким модификатором доступны из текущей сборки и из производных классов.
+                         
+    * private protected: такой член класса доступен из любого места в текущем классе или в производных классах, которые определены в той же сборке.                    
+          
+ */
+
+
+
 namespace ChildNodesPathDemo
 {
 
-    public class BaseObject
+    public abstract class EplanBaseNode
     {
         private string _Name;
         public string Name
@@ -51,19 +80,19 @@ namespace ChildNodesPathDemo
                 {
                     case "5":
                         _Name = "Преобразователи";
-                        StaticImage = new BitmapImage(new Uri("/Resources/5_Преобразователи.ico", UriKind.Relative));
+                        _Image = new BitmapImage(new Uri("/Resources/5_Преобразователи.ico", UriKind.Relative));
                         OriginName = value;
                         break;
 
                     case "6":
                         _Name = "Защитные утсройства";
-                        StaticImage = new BitmapImage(new Uri("/Resources/6_Защитные устройства.ico", UriKind.Relative));
+                        _Image = new BitmapImage(new Uri("/Resources/6_Защитные устройства.ico", UriKind.Relative));
                         OriginName = value;
                         break;
 
                     case "12":
                         _Name = "Сенсорная техника, выключатель и кнопочный переключатель";
-                        StaticImage = new BitmapImage(new Uri("/Resources/12_Сенсорная техника, выключатель и кнопочный переключатель.ico", UriKind.Relative));
+                        _Image = new BitmapImage(new Uri("/Resources/12_Сенсорная техника, выключатель и кнопочный переключатель.ico", UriKind.Relative));
                         OriginName = value;
                         break;
                     default:
@@ -77,7 +106,7 @@ namespace ChildNodesPathDemo
                             _Name = value;
                         }
                         OriginName = value;
-                        StaticImage = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
+                        _Image = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
                         break;
                 }
             }
@@ -89,20 +118,20 @@ namespace ChildNodesPathDemo
         public int NodeId { get;  private set; }
         public override string ToString() { return Name; }
 
-        protected BitmapImage StaticImage;
-        public BaseObject()
+        protected BitmapImage _Image;
+        public EplanBaseNode()
         {
             Id++;
             NodeId = Id;
             //StaticImage = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
         }
-        public BitmapImage Image { get { return StaticImage; } }
+        public BitmapImage Image { get { return _Image; } }
     }
 
-    public class ProjectObject : BaseObject
+    public class EplanNode : EplanBaseNode
     {
 
-        public ObservableCollection<ProjectObject> SubNode { get; set; }
+        public ObservableCollection<EplanNode> SubNode { get; set; }
 
         
 
@@ -111,7 +140,7 @@ namespace ChildNodesPathDemo
 
     public class ViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<ProjectObject> DataItems { get; set; }
+        public ObservableCollection<EplanNode> DataItems { get; set; }
 
         private string _Test = "ПРИВЯЗКА";
         public string Test
@@ -162,16 +191,16 @@ namespace ChildNodesPathDemo
         public ViewModel()
         {
             DataItems = InitData();
-
+            
 
         }
 
         public void Foo()
         {
 
-            ProjectObject result2 = DataItems.Flatten(i => i.SubNode).
-                                              FirstOrDefault(i => (/*i.Name == ((ProjectObject)SelectedNode2?.Content)?.Name && */
-                                                                   i.NodeId == ((ProjectObject)SelectedNode2?.Content)?.NodeId));
+            EplanNode result2 = DataItems.Flatten(i => i.SubNode).
+                                              FirstOrDefault(i => (/*i.Name == ((EplanNode)SelectedNode2?.Content)?.Name && */
+                                                                   i.NodeId == ((EplanNode)SelectedNode2?.Content)?.NodeId));
 
             if (SelectedNode1!=null)
             {
@@ -181,7 +210,7 @@ namespace ChildNodesPathDemo
                 
             if (result2.SubNode != null)
             {
-                result2.SubNode.Add((ProjectObject)SelectedNode1?.Content);
+                result2.SubNode.Add((EplanNode)SelectedNode1?.Content);
             }
             else MessageBox.Show("Сюда класть нихуя нельзя!");
 
@@ -192,8 +221,8 @@ namespace ChildNodesPathDemo
         public string Foo2()
         {
 
-            ProjectObject result2 = DataItems.Flatten(i => i.SubNode).
-                                              FirstOrDefault(i => i.Name == ((ProjectObject)SelectedNode2?.Content)?.Name);
+            EplanNode result2 = DataItems.Flatten(i => i.SubNode).
+                                              FirstOrDefault(i => i.Name == ((EplanNode)SelectedNode2?.Content)?.Name);
 
             return result2.NodeId.ToString();
 
@@ -212,10 +241,10 @@ namespace ChildNodesPathDemo
 
 
 
-        private ObservableCollection<ProjectObject> InitData()
+        private ObservableCollection<EplanNode> InitData()
         {
-            ObservableCollection<ProjectObject> projects = new ObservableCollection<ProjectObject>();
-            //ProjectObject Project = new ProjectObject() { Name = "ProductTopGroup Электротехника", SubNode = new ObservableCollection<ProjectObject>() };
+            ObservableCollection<EplanNode> projects = new ObservableCollection<EplanNode>();
+            //EplanNode Project = new EplanNode() { Name = "ProductTopGroup Электротехника", SubNode = new ObservableCollection<EplanNode>() };
 
             InitProjectData(projects);
 
@@ -227,7 +256,7 @@ namespace ChildNodesPathDemo
         }
 
         //ищем в коллекции индекс по строчке, чтобы внутри него добавить SubNode
-        private static int find_index_in_collection(ObservableCollection<ProjectObject> collection, string find_string)
+        private static int find_index_in_collection(ObservableCollection<EplanNode> collection, string find_string)
         {
             //начинаем с конца, скорее новый элемент будет в конце дерева
             for (int i = collection.Count - 1; i >= 0; --i)
@@ -240,7 +269,7 @@ namespace ChildNodesPathDemo
             return -15;//magic number так как индексы не могут быть отрицательными, и если такого элемента еще нет в коллекции, возвращаем число любое меньше нуля (обычно -1 (типа код ошибки))
         }
 
-        void InitProjectData(ObservableCollection<ProjectObject> Project)
+        void InitProjectData(ObservableCollection<EplanNode> Project)
         {
             #region Подключение к БД, SQL запрос и сохранение в dataset
 
@@ -389,14 +418,14 @@ namespace ChildNodesPathDemo
             List<string> PartNrName = seq.Select(s => s.Field<string>("partnr")).ToList();
             List<string> NoteName = seq.Select(s => s.Field<string>("note")).ToList();
 
-            ObservableCollection<ProjectObject> ProductTopGroupNode = Project;
-            // ObservableCollection<ProjectObject> SupplierNode = new ObservableCollection<ProjectObject>();
-            // ObservableCollection<ProjectObject> ProductGroupNode = new ObservableCollection<ProjectObject>();
-            // ObservableCollection<ProjectObject> TypeNrNode = new ObservableCollection<ProjectObject>();
-            // ObservableCollection<ProjectObject> Description1Node = new ObservableCollection<ProjectObject>();
-            // ObservableCollection<ProjectObject> Description2Node = new ObservableCollection<ProjectObject>();
-            // ObservableCollection<ProjectObject> Description3Node = new ObservableCollection<ProjectObject>();
-            // ObservableCollection<ProjectObject> PartNrNode = new ObservableCollection<ProjectObject>();
+            ObservableCollection<EplanNode> ProductTopGroupNode = Project;
+            // ObservableCollection<EplanNode> SupplierNode = new ObservableCollection<EplanNode>();
+            // ObservableCollection<EplanNode> ProductGroupNode = new ObservableCollection<EplanNode>();
+            // ObservableCollection<EplanNode> TypeNrNode = new ObservableCollection<EplanNode>();
+            // ObservableCollection<EplanNode> Description1Node = new ObservableCollection<EplanNode>();
+            // ObservableCollection<EplanNode> Description2Node = new ObservableCollection<EplanNode>();
+            // ObservableCollection<EplanNode> Description3Node = new ObservableCollection<EplanNode>();
+            // ObservableCollection<EplanNode> PartNrNode = new ObservableCollection<EplanNode>();
 
             //так как количество строчек во всех столбцах одинаково, идем по любому из них, в данном случае по первому, идем по каждой строчке и заполняем дерево.  
             // То есть по сути формируем слои дерева 
@@ -409,64 +438,64 @@ namespace ChildNodesPathDemo
                 //если не нашли эл-т с таким именем, то добавляем его в конец и запоминаем индекс добавленного
                 if (j < 0)
                 {
-                    ProductTopGroupNode.Add(new ProjectObject() { Name = string_ProductTopGroupName,  SubNode = new ObservableCollection<ProjectObject>() });
+                    ProductTopGroupNode.Add(new EplanNode() { Name = string_ProductTopGroupName,  SubNode = new ObservableCollection<EplanNode>() });
                     j = ProductTopGroupNode.Count - 1; // индекс последнего добавленного элемента. Т.к. метод Add добавляет в конец коллекции
                 }
                 //переходим вниз по дереву к следующей группе элементов в ту ветвь, в которую зашли выше
-                ObservableCollection<ProjectObject> SupplierNode = ProductTopGroupNode[j].SubNode;
+                ObservableCollection<EplanNode> SupplierNode = ProductTopGroupNode[j].SubNode;
                 j = find_index_in_collection(SupplierNode, SupplierName[i]);
                 if (j < 0)
                 {
-                    SupplierNode.Add(new ProjectObject() { Name = SupplierName[i], SubNode = new ObservableCollection<ProjectObject>() });
+                    SupplierNode.Add(new EplanNode() { Name = SupplierName[i], SubNode = new ObservableCollection<EplanNode>() });
                     j = SupplierNode.Count - 1;
                 }
 
-                ObservableCollection<ProjectObject> ProductGroupNode = SupplierNode[j].SubNode;
+                ObservableCollection<EplanNode> ProductGroupNode = SupplierNode[j].SubNode;
                 string string_ProductGroupName = ProductGroupName[i].ToString();
                 j = find_index_in_collection(ProductGroupNode, string_ProductGroupName);
                 if (j < 0)
                 {
-                    ProductGroupNode.Add(new ProjectObject() { Name = string_ProductGroupName, SubNode = new ObservableCollection<ProjectObject>() });
+                    ProductGroupNode.Add(new EplanNode() { Name = string_ProductGroupName, SubNode = new ObservableCollection<EplanNode>() });
                     j = ProductGroupNode.Count - 1;
                 }
 
-                ObservableCollection<ProjectObject> TypeNrNode = ProductGroupNode[j].SubNode;
+                ObservableCollection<EplanNode> TypeNrNode = ProductGroupNode[j].SubNode;
                 j = find_index_in_collection(TypeNrNode, TypeNrName[i]);
                 if (j < 0)
                 {
-                    TypeNrNode.Add(new ProjectObject() { Name = TypeNrName[i], SubNode = new ObservableCollection<ProjectObject>() });
+                    TypeNrNode.Add(new EplanNode() { Name = TypeNrName[i], SubNode = new ObservableCollection<EplanNode>() });
                     j = TypeNrNode.Count - 1;
                 }
 
-                ObservableCollection<ProjectObject> Description1Node = TypeNrNode[j].SubNode;
+                ObservableCollection<EplanNode> Description1Node = TypeNrNode[j].SubNode;
                 j = find_index_in_collection(Description1Node, Description1Name[i]);
                 if (j < 0)//hui
                 {
-                    Description1Node.Add(new ProjectObject() { Name = Description1Name[i], SubNode = new ObservableCollection<ProjectObject>() });
+                    Description1Node.Add(new EplanNode() { Name = Description1Name[i], SubNode = new ObservableCollection<EplanNode>() });
                     j = Description1Node.Count - 1;
                 }
 
-                ObservableCollection<ProjectObject> Description2Node = Description1Node[j].SubNode;
+                ObservableCollection<EplanNode> Description2Node = Description1Node[j].SubNode;
                 j = find_index_in_collection(Description2Node, Description2Name[i]);
                 if (j < 0)
                 {
-                    Description2Node.Add(new ProjectObject() { Name = Description2Name[i], SubNode = new ObservableCollection<ProjectObject>() });
+                    Description2Node.Add(new EplanNode() { Name = Description2Name[i], SubNode = new ObservableCollection<EplanNode>() });
                     j = Description2Node.Count - 1;
                 }
 
-                ObservableCollection<ProjectObject> Description3Node = Description2Node[j].SubNode;
+                ObservableCollection<EplanNode> Description3Node = Description2Node[j].SubNode;
                 j = find_index_in_collection(Description3Node, Description3Name[i]);
                 if (j < 0)
                 {
-                    Description3Node.Add(new ProjectObject() { Name = Description3Name[i], SubNode = new ObservableCollection<ProjectObject>() });
+                    Description3Node.Add(new EplanNode() { Name = Description3Name[i], SubNode = new ObservableCollection<EplanNode>() });
                     j = Description3Node.Count - 1;
                 }
 
-                ObservableCollection<ProjectObject> PartNrNode = Description3Node[j].SubNode;
+                ObservableCollection<EplanNode> PartNrNode = Description3Node[j].SubNode;
                 j = find_index_in_collection(PartNrNode, PartNrName[i]);
                 if (j < 0)
                 {
-                    PartNrNode.Add(new ProjectObject() { Name = PartNrName[i], Executor = NoteName[i] });
+                    PartNrNode.Add(new EplanNode() { Name = PartNrName[i], Executor = NoteName[i] });
                     j = PartNrNode.Count - 1;
                 }
             }
@@ -487,18 +516,18 @@ namespace ChildNodesPathDemo
                     node.Name = "Механика";
                 }
 
-                node.SubNode = new ObservableCollection<ProjectObject>(node.SubNode.OrderBy(i => i.Name));
+                node.SubNode = new ObservableCollection<EplanNode>(node.SubNode.OrderBy(i => i.Name));
             }
 
             #region Старые циклы)
             // for (int i = 0; i < ProductTopGroupName.Count; i++)
             // {
-            //     ProductTopGroupNode.Add(new ProjectObject() { Name = ProductTopGroupName[i].ToString(), SubNode = new ObservableCollection<BaseObject>() });
+            //     ProductTopGroupNode.Add(new EplanNode() { Name = ProductTopGroupName[i].ToString(), SubNode = new ObservableCollection<EplanBaseNode>() });
             //     SupplierName = seq.Where(s => s.Field<short>("producttopgroup") == ProductTopGroupName[i]).Select(s => s.Field<string>("supplier")).Distinct().ToList();
 
             //     for (int j = 0; j < SupplierName.Count; j++)
             //     {
-            //         SupplierNode.Add(new ProjectObject() { Name = SupplierName[j], SubNode = new ObservableCollection<BaseObject>() });
+            //         SupplierNode.Add(new EplanNode() { Name = SupplierName[j], SubNode = new ObservableCollection<EplanBaseNode>() });
             //         var jj = SupplierNode[SupplierNode.IndexOf(SupplierNode.Last(x => x.Name == SupplierName[j]))];
             //         ProductTopGroupNode[i].SubNode.Add(jj);
             //         // ProductTopGroupNode[i].Tasks.Add(SupplierNode[j]);
@@ -507,7 +536,7 @@ namespace ChildNodesPathDemo
 
             //         for (int k = 0; k < ProductGroupName.Count; k++)
             //         {
-            //             ProductGroupNode.Add(new ProjectObject() { Name = ProductGroupName[k].ToString(), SubNode = new ObservableCollection<BaseObject>() });
+            //             ProductGroupNode.Add(new EplanNode() { Name = ProductGroupName[k].ToString(), SubNode = new ObservableCollection<EplanBaseNode>() });
             //             var kk = ProductGroupNode[ProductGroupNode.IndexOf(ProductGroupNode.Last(x => x.OriginName == ProductGroupName[k].ToString()))];
             //             jj.SubNode.Add(kk);
             //             //SupplierNode[j].Tasks.Add(ProductGroupNode[ProductGroupNode.IndexOf(ProductGroupNode.First(x => x.Name == ProductGroupName[k].ToString()))]);
@@ -518,7 +547,7 @@ namespace ChildNodesPathDemo
 
             //             for (int l = 0; l < TypeNrName.Count; l++)
             //             {
-            //                 TypeNrNode.Add(new ProjectObject() { Name = TypeNrName[l], SubNode = new ObservableCollection<BaseObject>() });
+            //                 TypeNrNode.Add(new EplanNode() { Name = TypeNrName[l], SubNode = new ObservableCollection<EplanBaseNode>() });
             //                 var ll = TypeNrNode[TypeNrNode.IndexOf(TypeNrNode.Last(x => x.Name == TypeNrName[l]))];
             //                 //ProductGroupNode[kk].Tasks.Add(TypeNrNode[TypeNrNode.IndexOf(TypeNrNode.First(x => x.Name == TypeNrName[l]))]);
             //                 kk.SubNode.Add(ll);
@@ -530,7 +559,7 @@ namespace ChildNodesPathDemo
 
             //                 for (int m = 0; m < Description1Name.Count; m++)
             //                 {
-            //                     Description1Node.Add(new ProjectObject() { Name = Description1Name[m], SubNode = new ObservableCollection<BaseObject>() });
+            //                     Description1Node.Add(new EplanNode() { Name = Description1Name[m], SubNode = new ObservableCollection<EplanBaseNode>() });
             //                     var mm = Description1Node[Description1Node.IndexOf(Description1Node.Last(x => x.Name == Description1Name[m]))];
             //                     //TypeNrNode[l].Tasks.Add(Description3Node[Description3Node.IndexOf(Description3Node.First(x => x.Name == Description3Name[m]))]);
             //                     ll.SubNode.Add(mm);
@@ -543,7 +572,7 @@ namespace ChildNodesPathDemo
 
             //                     for (int n = 0; n < Description2Name.Count; n++)
             //                     {
-            //                         Description2Node.Add(new ProjectObject() { Name = Description2Name[n], SubNode = new ObservableCollection<BaseObject>() });
+            //                         Description2Node.Add(new EplanNode() { Name = Description2Name[n], SubNode = new ObservableCollection<EplanBaseNode>() });
             //                         var nn = Description2Node[Description2Node.IndexOf(Description2Node.Last(x => x.Name == Description2Name[n]))];
             //                         mm.SubNode.Add(nn);
 
@@ -557,7 +586,7 @@ namespace ChildNodesPathDemo
 
             //                         for (int o = 0; o < Description3Name.Count; o++)
             //                         {
-            //                             Description3Node.Add(new ProjectObject() { Name = Description3Name[o], SubNode = new ObservableCollection<BaseObject>() });
+            //                             Description3Node.Add(new EplanNode() { Name = Description3Name[o], SubNode = new ObservableCollection<EplanBaseNode>() });
             //                             var oo = Description3Node[Description3Node.IndexOf(Description3Node.Last(x => x.Name == Description3Name[o]))];
             //                             nn.SubNode.Add(oo);
 
@@ -572,7 +601,7 @@ namespace ChildNodesPathDemo
 
             //                             for (int p = 0; p < PartNrName.Count; p++)
             //                             {
-            //                                 PartNrNode.Add(new ProjectObject() { Name = PartNrName[p] });
+            //                                 PartNrNode.Add(new EplanNode() { Name = PartNrName[p] });
             //                                 var pp = PartNrNode[PartNrNode.IndexOf(PartNrNode.Last(x => x.Name == PartNrName[p]))];
             //                                 oo.SubNode.Add(pp);
 
