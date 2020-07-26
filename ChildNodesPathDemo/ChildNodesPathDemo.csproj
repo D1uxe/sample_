@@ -142,9 +142,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\гейтс.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\_Folder.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -156,6 +153,29 @@
   <ItemGroup>
     <Resource Include="Resources\5_Преобразователи.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\17%2847%29_Разное%28Принадлежности%29.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\32_Испольнительные элементы, общ.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\2_Реле,контакторы.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\8%28115%29_Сигнальные устройства.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\13_Трансформаторы.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\20_Источник напряжения и генератор.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\10_Измерительные устройства, контрольное оборудование.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\3_Клеммы.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

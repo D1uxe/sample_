@@ -1,4 +1,5 @@
-﻿using DevExpress.Xpf.Grid;
+﻿using DevExpress.RichEdit.Export;
+using DevExpress.Xpf.Grid;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,29 +9,38 @@ using System.Data.OleDb;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 /*
-     * В режиме отладки: Watch Ctr+D,W QuickWatch Ctr+D,Q
      * Форматирование выбранной части Ctr+E+F, форматирование всего Ctr+E+D
      * Удалить строку Ctr+Shift+L, вырезать строку Ctrl+L поднять/опустить строку Alt+стрелка вверх/вниз
-     * Добавить строку сверзу Ctrl+Enter, добавить строку снизу Ctrl+Shift+Enter
+     * Добавить строку сверху Ctrl+Enter, добавить строку снизу Ctrl+Shift+Enter
      * Транспонировать строку Shift+ALT+T
      * Буфер обмена Ctr+Shift+V
-     * Свернуть/развернуть блок Ctr+M,M
-     * Свернуть/развернуть ВСЕ блоки Ctr+M,O
-     * Начало/окончание блоков {}, комментирования, или #region Ctr+]
-     * Перейти к номеру строки Ctr+G
-     * Перейти к определению класса/метода/свойства F12
-     * Помощник Ctr+Space, Ctr+J
-     * Показ всех снипетов Ctr+K,X
      * Закоментировать выбранные линии Ctr+E,C;  раскомментировать Ctr+E,U
      * Окружить выделенный текст  Ctr+K,S
      * Дублировать строку Ctr+E,V вставляет выше
      * Быстрые действия Ctr+.
      * Несколько точек вставки Ctr+ALT+нажатие
      * Выбор блока ALT и тащим мышь или SHIFT+ALT+стрелки
+
+     Отладка
+     * В режиме отладки: Watch Ctr+D,W QuickWatch Ctr+D,Q
      * Удалить все точки останова Ctrl+Shift+F9
+
+     Помощь
+     * Помощник Ctr+Space, Ctr+J
+     * Показ всех снипетов Ctr+K,X
+
+     Навигация по коду:
+     * Перейти к определению класса/метода/свойства F12
+     * Перейти к номеру строки Ctr+G
+     * Перейти к последнему изменению Ctrl+Shift+Backspace
+     * Начало/окончание блоков {}, комментирования, или #region Ctr+]
+     * Свернуть/развернуть блок Ctr+M,M
+     * Свернуть/развернуть ВСЕ блоки Ctr+M,O
+      
      Рефакторинг:
      * Ctrl+R, Ctrl+M(комбинация) — выделение метода
      * Ctrl+R, Ctrl+E(комбинация) — инкапсуляция свойства
@@ -65,7 +75,7 @@ using System.Windows.Media.Imaging;
 namespace ChildNodesPathDemo
 {
 
-    public abstract class EplanBaseNode
+    public abstract class EplanNodeBase
     {
         private string _Name;
         public string Name
@@ -76,16 +86,26 @@ namespace ChildNodesPathDemo
             }
             set
             {
+                GetProductGroupNameAndImageId(ParentNode, value);
+                /*
                 switch (value)
                 {
+                    //case "1":
+                    //    _Name = "Электротехника";
+                    //    _Image = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
+                    //    OriginName = value;
+
+                    //    break;
+
                     case "5":
                         _Name = "Преобразователи";
                         _Image = new BitmapImage(new Uri("/Resources/5_Преобразователи.ico", UriKind.Relative));
                         OriginName = value;
+
                         break;
 
                     case "6":
-                        _Name = "Защитные утсройства";
+                        _Name = "Защитные устройства";
                         _Image = new BitmapImage(new Uri("/Resources/6_Защитные устройства.ico", UriKind.Relative));
                         OriginName = value;
                         break;
@@ -106,34 +126,167 @@ namespace ChildNodesPathDemo
                             _Name = value;
                         }
                         OriginName = value;
+                        //_Image = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
                         _Image = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
+                        
+                        _ = ParentNode;
+                        break;
+                }
+               */ 
+            }
+        }
+
+        public string OriginName { get; private set; }
+        public string Note { get; set; }
+        private static int Id { get; set; }
+        public int NodeId { get; private set; }
+        public override string ToString() { return Name; }
+        //private BitmapImage _Image;
+        //public BitmapImage Image { get { return _Image; } }
+         public BitmapImage Image { get; private set; }
+
+        // private static BitmapImage _ImageId;
+        public EplanNode ParentNode { get; set; }
+
+
+        private void GetProductGroupNameAndImageId(in EplanNode ParentNode, string Value/*, ref string Name, ref BitmapImage Image */)
+        {
+            //Если это узел root
+            if (ParentNode == null)
+            {
+                Image = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
+                _Name = Value;
+                OriginName = Value;
+                return;
+            }
+            //Если у пришедшего узла родительским узлом являеттся узел root
+            if (ParentNode?.NodeId == 0)
+            {
+                switch (Value)
+                {
+                    case "1":
+                        _Name = "Электротехника";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
+                        break;
+
+                    case "2":
+                        _Name = "Fluid-Техника";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
+                        break;
+
+                    case "3":
+                        _Name = "Механика";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
+                        break;
+
+                    default:
+                        _Name = "??????????????";
+                        OriginName = Value;
+                        break;
+                }
+            }
+            else // иначе, если у пришедшего узла родительским является любой другой, то расшифруем их названия и выставим картинку
+            {
+                switch (Value)
+                {
+
+
+                    case "2":
+                        _Name = "Реле,контакторы";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/2_Реле,контакторы.ico", UriKind.Relative));
+                        break;
+
+                    case "3":
+                        _Name = "Клеммы";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/3_Клеммы.ico", UriKind.Relative));
+                        break;
+
+                    case "5":
+                        _Name = "Преобразователи";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/5_Преобразователи.ico", UriKind.Relative));
+                        break;
+
+                    case "6":
+                        _Name = "Защитные устройства";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/6_Защитные устройства.ico", UriKind.Relative));
+                        break;
+
+                    case "8":
+                        _Name = "Сигнальные устройства";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/8(115)_Сигнальные устройства.ico", UriKind.Relative));
+                        break;
+
+                    case "10":
+                        _Name = "Измерительные устройства, контрольное оборудование";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/10_Измерительные устройства, контрольное оборудование.ico", UriKind.Relative));
+                        break;
+
+                    case "12":
+                        _Name = "Сенсорная техника, выключатель и кнопочный переключатель";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/12_Сенсорная техника, выключатель и кнопочный переключатель.ico", UriKind.Relative));
+                        break;
+
+                    case "13":
+                        _Name = "Трансформаторы";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/13_Трансформаторы.ico", UriKind.Relative));
+                        break;
+
+                    case "17":
+                        _Name = "Разное";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/17(47)_Разное(Принадлежности).ico", UriKind.Relative));
+                        break;
+
+                    case "20":
+                        _Name = "Источник напряжения и генератор";
+                        OriginName = Value;
+                        Image = new BitmapImage(new Uri("/Resources/20_Источник напряжения и генератор.ico", UriKind.Relative));
+                        break;
+
+                    default:
+                        //убрираем ??_??@ и ru_RU@ путем проверки 3го и 6го символа в строках где это есть, и оставляем имя с 6го символа
+                        if (Value != null && Value.Length > 6 && Value[2] == '_' && Value[5] == '@')
+                        {
+                            _Name = Value.Substring(6);
+                        }
+                        else
+                        {
+                            _Name = Value;
+                        }
+                        // если пришел узел у которого нечего расшифровывать, то запомним его оригинальное имя из таблицы БД 
+                        // и запомним картинку, которая была у родителя
+                        OriginName = Value;
+                        Image = ParentNode?.Image;
                         break;
                 }
             }
         }
 
-        public string OriginName { get; private set; }
-        public string Executor { get; set; }
-        private static int Id { get;  set; }
-        public int NodeId { get;  private set; }
-        public override string ToString() { return Name; }
-
-        protected BitmapImage _Image;
-        public EplanBaseNode()
+        public EplanNodeBase()
         {
-            Id++;
-            NodeId = Id;
-            //StaticImage = new BitmapImage(new Uri("/Resources/_Folder.ico", UriKind.Relative));
+
+            NodeId = Id++;
         }
-        public BitmapImage Image { get { return _Image; } }
+
     }
 
-    public class EplanNode : EplanBaseNode
+    public class EplanNode : EplanNodeBase
     {
 
         public ObservableCollection<EplanNode> SubNode { get; set; }
 
-        
+
 
     }
 
@@ -154,8 +307,8 @@ namespace ChildNodesPathDemo
             }
         }
 
-        
-        
+
+
         #region SelectedNode1 : TreeListNode - выделенный узел первого деерева
         private TreeListNode _SelectedNode1;
         public TreeListNode SelectedNode1
@@ -191,25 +344,26 @@ namespace ChildNodesPathDemo
         public ViewModel()
         {
             DataItems = InitData();
-            
+
 
         }
 
         public void Foo()
         {
-
+            //нашли объект выделенного узла. Распрямили все дерево и в нем нашли первый объект у которого Id совпадают
             EplanNode result2 = DataItems.Flatten(i => i.SubNode).
-                                              FirstOrDefault(i => (/*i.Name == ((EplanNode)SelectedNode2?.Content)?.Name && */
-                                                                   i.NodeId == ((EplanNode)SelectedNode2?.Content)?.NodeId));
+                                          FirstOrDefault(i => (/*i.Name == ((EplanNode)SelectedNode2?.Content)?.Name && */
+                                                                 i.NodeId == ((EplanNode)SelectedNode2?.Content)?.NodeId));
 
-            if (SelectedNode1!=null)
+            if (SelectedNode1 != null)
             {
                 SelectedNode2.IsExpanded = true;
             }
 
-                
+            // у выделеннго узла есть дети, то кладем в ребенка узел, по которому кликнули в первом дереве    
             if (result2.SubNode != null)
             {
+               // ((EplanNode)SelectedNode1?.Content).Image = ((EplanNode)SelectedNode2?.Content).Image;
                 result2.SubNode.Add((EplanNode)SelectedNode1?.Content);
             }
             else MessageBox.Show("Сюда класть нихуя нельзя!");
@@ -222,11 +376,11 @@ namespace ChildNodesPathDemo
         {
 
             EplanNode result2 = DataItems.Flatten(i => i.SubNode).
-                                              FirstOrDefault(i => i.Name == ((EplanNode)SelectedNode2?.Content)?.Name);
+                                          FirstOrDefault(i => i.NodeId == ((EplanNode)SelectedNode2?.Content)?.NodeId);
 
             return result2.NodeId.ToString();
 
-           // MessageBox.Show(result2.NodeId.ToString());
+            // MessageBox.Show(result2.NodeId.ToString());
 
         }
 
@@ -243,25 +397,19 @@ namespace ChildNodesPathDemo
 
         private ObservableCollection<EplanNode> InitData()
         {
-            ObservableCollection<EplanNode> projects = new ObservableCollection<EplanNode>();
-            //EplanNode Project = new EplanNode() { Name = "ProductTopGroup Электротехника", SubNode = new ObservableCollection<EplanNode>() };
+            ObservableCollection<EplanNode> RootNode = new ObservableCollection<EplanNode> { new EplanNode() { ParentNode = null, Name = "Изделие", SubNode = new ObservableCollection<EplanNode>() } };
 
-            InitProjectData(projects);
-
-
-            //projects.Add(Project);
-
-
-            return projects;
+            InitProjectData(RootNode);
+            return RootNode;
         }
 
-        //ищем в коллекции индекс по строчке, чтобы внутри него добавить SubNode
-        private static int find_index_in_collection(ObservableCollection<EplanNode> collection, string find_string)
+        //ищем в коллекции индекс по свойству Name, чтобы внутри него добавить SubNode
+        private static int FindIndexInCollection(ObservableCollection<EplanNode> Collection, string find_string)
         {
             //начинаем с конца, скорее новый элемент будет в конце дерева
-            for (int i = collection.Count - 1; i >= 0; --i)
+            for (int i = Collection.Count - 1; i >= 0; --i)
             {
-                if (collection[i].OriginName == find_string)
+                if (Collection[i].OriginName == find_string)
                 {
                     return i;
                 }
@@ -269,12 +417,13 @@ namespace ChildNodesPathDemo
             return -15;//magic number так как индексы не могут быть отрицательными, и если такого элемента еще нет в коллекции, возвращаем число любое меньше нуля (обычно -1 (типа код ошибки))
         }
 
-        void InitProjectData(ObservableCollection<EplanNode> Project)
+        void InitProjectData(ObservableCollection<EplanNode> RootNode)
         {
             #region Подключение к БД, SQL запрос и сохранение в dataset
 
             // либо создадим эту строку сами напрямую
-            string connectionString = @"Provider=Microsoft.JET.OLEDB.4.0; Data Source=..\..\db\База_Изделий.mdb";
+            string connectionString = @"Provider=Microsoft.JET.OLEDB.4.0; Data Source=C:\Users\bugrov\Desktop\sample_\ChildNodesPathDemo\db\База_Изделий.mdb";
+            //string connectionString = @"Provider=Microsoft.JET.OLEDB.4.0; Data Source=D:\Личное\Проект С#\sample_\ChildNodesPathDemo\db\База_Изделий.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=..\..\db\ESS_part005_ONLY_ABB.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=..\..\db\ESS_part002.mdb";
             //@"Provider=Microsoft.JET.OLEDB.4.0; Data Source=F:\Project KP\ESS_part002.mdb";
@@ -287,7 +436,7 @@ namespace ChildNodesPathDemo
             //само подключение и запрос
             using (OleDbConnection connection = new OleDbConnection(connectionString))
             {
-                string SQLQuery = "SELECT * FROM tblPart";
+                string SQLQuery = "SELECT * FROM tblPart order by supplier";
 
                 try
                 {
@@ -397,6 +546,7 @@ namespace ChildNodesPathDemo
             #endregion
 
 
+            #region MyRegion
 
             // List<short> ProductTopGroupName = seq.Select(s => s.Field<short>("producttopgroup")).Distinct().ToList();
             // List<string> SupplierName;
@@ -405,7 +555,8 @@ namespace ChildNodesPathDemo
             // List<string> Description1Name;
             // List<string> Description2Name;
             // List<string> Description3Name;
-            // List<string> PartNrName;
+            // List<string> PartNrName; 
+            #endregion
 
             //достаем все значения всех нужных нам столбцов, так как структура записей в бд одинаковая, то кол-во эл-в везде одинаково
             List<short> ProductTopGroupName = seq.Select(s => s.Field<short>("producttopgroup")).ToList();
@@ -418,167 +569,192 @@ namespace ChildNodesPathDemo
             List<string> PartNrName = seq.Select(s => s.Field<string>("partnr")).ToList();
             List<string> NoteName = seq.Select(s => s.Field<string>("note")).ToList();
 
-            ObservableCollection<EplanNode> ProductTopGroupNode = Project;
+            ObservableCollection<EplanNode> ProductTopGroupNode = RootNode[0].SubNode;
+
+
+            #region MyRegion
+
             // ObservableCollection<EplanNode> SupplierNode = new ObservableCollection<EplanNode>();
             // ObservableCollection<EplanNode> ProductGroupNode = new ObservableCollection<EplanNode>();
             // ObservableCollection<EplanNode> TypeNrNode = new ObservableCollection<EplanNode>();
             // ObservableCollection<EplanNode> Description1Node = new ObservableCollection<EplanNode>();
             // ObservableCollection<EplanNode> Description2Node = new ObservableCollection<EplanNode>();
             // ObservableCollection<EplanNode> Description3Node = new ObservableCollection<EplanNode>();
-            // ObservableCollection<EplanNode> PartNrNode = new ObservableCollection<EplanNode>();
+            // ObservableCollection<EplanNode> PartNrNode = new ObservableCollection<EplanNode>(); 
+            #endregion
 
             //так как количество строчек во всех столбцах одинаково, идем по любому из них, в данном случае по первому, идем по каждой строчке и заполняем дерево.  
             // То есть по сути формируем слои дерева 
             for (int i = 0; i < ProductTopGroupName.Count; ++i)
             {
                 string string_ProductTopGroupName = ProductTopGroupName[i].ToString();
-                int j;
+                int index;
+                int ParentIndex;
                 //ищем элемент по имени, проверяя его уникальность
-                j = find_index_in_collection(ProductTopGroupNode, string_ProductTopGroupName);
+                index = FindIndexInCollection(ProductTopGroupNode, string_ProductTopGroupName);
                 //если не нашли эл-т с таким именем, то добавляем его в конец и запоминаем индекс добавленного
-                if (j < 0)
+                if (index < 0)
                 {
-                    ProductTopGroupNode.Add(new EplanNode() { Name = string_ProductTopGroupName,  SubNode = new ObservableCollection<EplanNode>() });
-                    j = ProductTopGroupNode.Count - 1; // индекс последнего добавленного элемента. Т.к. метод Add добавляет в конец коллекции
+                    ProductTopGroupNode.Add(new EplanNode() { ParentNode = RootNode[0], Name = string_ProductTopGroupName, SubNode = new ObservableCollection<EplanNode>() });
+                    index = ProductTopGroupNode.Count - 1; // индекс последнего добавленного элемента. Т.к. метод Add добавляет в конец коллекции
+                    ParentIndex = index;
                 }
+
                 //переходим вниз по дереву к следующей группе элементов в ту ветвь, в которую зашли выше
-                ObservableCollection<EplanNode> SupplierNode = ProductTopGroupNode[j].SubNode;
-                j = find_index_in_collection(SupplierNode, SupplierName[i]);
-                if (j < 0)
+                ParentIndex = index;// запомнили вышестоящий(родительский индекс)
+                ObservableCollection<EplanNode> SupplierNode = ProductTopGroupNode[index].SubNode;
+                index = FindIndexInCollection(SupplierNode, SupplierName[i]);
+                if (index < 0)
                 {
-                    SupplierNode.Add(new EplanNode() { Name = SupplierName[i], SubNode = new ObservableCollection<EplanNode>() });
-                    j = SupplierNode.Count - 1;
+                    SupplierNode.Add(new EplanNode() { ParentNode = ProductTopGroupNode[ParentIndex], Name = SupplierName[i], SubNode = new ObservableCollection<EplanNode>() });
+                    index = SupplierNode.Count - 1;
+                    ParentIndex = index;
                 }
 
-                ObservableCollection<EplanNode> ProductGroupNode = SupplierNode[j].SubNode;
+                ParentIndex = index;
+                ObservableCollection<EplanNode> ProductGroupNode = SupplierNode[index].SubNode;
                 string string_ProductGroupName = ProductGroupName[i].ToString();
-                j = find_index_in_collection(ProductGroupNode, string_ProductGroupName);
-                if (j < 0)
+                index = FindIndexInCollection(ProductGroupNode, string_ProductGroupName);
+                if (index < 0)
                 {
-                    ProductGroupNode.Add(new EplanNode() { Name = string_ProductGroupName, SubNode = new ObservableCollection<EplanNode>() });
-                    j = ProductGroupNode.Count - 1;
+                    ProductGroupNode.Add(new EplanNode() { ParentNode = SupplierNode[ParentIndex], Name = string_ProductGroupName, SubNode = new ObservableCollection<EplanNode>() });
+                    index = ProductGroupNode.Count - 1;
+                    ParentIndex = index;
+
                 }
 
-                ObservableCollection<EplanNode> TypeNrNode = ProductGroupNode[j].SubNode;
-                j = find_index_in_collection(TypeNrNode, TypeNrName[i]);
-                if (j < 0)
+                ParentIndex = index;
+                ObservableCollection<EplanNode> TypeNrNode = ProductGroupNode[index].SubNode;
+                index = FindIndexInCollection(TypeNrNode, TypeNrName[i]);
+                if (index < 0)
                 {
-                    TypeNrNode.Add(new EplanNode() { Name = TypeNrName[i], SubNode = new ObservableCollection<EplanNode>() });
-                    j = TypeNrNode.Count - 1;
+                    TypeNrNode.Add(new EplanNode() { ParentNode = ProductGroupNode[ParentIndex], Name = TypeNrName[i], SubNode = new ObservableCollection<EplanNode>() });
+                    index = TypeNrNode.Count - 1;
+                    ParentIndex = index;
+
                 }
 
-                ObservableCollection<EplanNode> Description1Node = TypeNrNode[j].SubNode;
-                j = find_index_in_collection(Description1Node, Description1Name[i]);
-                if (j < 0)//hui
+                ParentIndex = index;
+                ObservableCollection<EplanNode> Description1Node = TypeNrNode[index].SubNode;
+                index = FindIndexInCollection(Description1Node, Description1Name[i]);
+                if (index < 0)
                 {
-                    Description1Node.Add(new EplanNode() { Name = Description1Name[i], SubNode = new ObservableCollection<EplanNode>() });
-                    j = Description1Node.Count - 1;
+                    Description1Node.Add(new EplanNode() { ParentNode = TypeNrNode[ParentIndex], Name = Description1Name[i], SubNode = new ObservableCollection<EplanNode>() });
+                    index = Description1Node.Count - 1;
+                    ParentIndex = index;
+
                 }
 
-                ObservableCollection<EplanNode> Description2Node = Description1Node[j].SubNode;
-                j = find_index_in_collection(Description2Node, Description2Name[i]);
-                if (j < 0)
+                ParentIndex = index;
+                ObservableCollection<EplanNode> Description2Node = Description1Node[index].SubNode;
+                index = FindIndexInCollection(Description2Node, Description2Name[i]);
+                if (index < 0)
                 {
-                    Description2Node.Add(new EplanNode() { Name = Description2Name[i], SubNode = new ObservableCollection<EplanNode>() });
-                    j = Description2Node.Count - 1;
+                    Description2Node.Add(new EplanNode() { ParentNode = Description1Node[ParentIndex], Name = Description2Name[i], SubNode = new ObservableCollection<EplanNode>() });
+                    index = Description2Node.Count - 1;
+                    ParentIndex = index;
+
+                }
+                ParentIndex = index;
+                ObservableCollection<EplanNode> Description3Node = Description2Node[index].SubNode;
+                index = FindIndexInCollection(Description3Node, Description3Name[i]);
+                if (index < 0)
+                {
+                    Description3Node.Add(new EplanNode() { ParentNode = Description2Node[ParentIndex], Name = Description3Name[i], SubNode = new ObservableCollection<EplanNode>() });
+                    index = Description3Node.Count - 1;
+                    ParentIndex = index;
+
                 }
 
-                ObservableCollection<EplanNode> Description3Node = Description2Node[j].SubNode;
-                j = find_index_in_collection(Description3Node, Description3Name[i]);
-                if (j < 0)
+                ParentIndex = index;
+                ObservableCollection<EplanNode> PartNrNode = Description3Node[index].SubNode;
+                index = FindIndexInCollection(PartNrNode, PartNrName[i]);
+                if (index < 0)
                 {
-                    Description3Node.Add(new EplanNode() { Name = Description3Name[i], SubNode = new ObservableCollection<EplanNode>() });
-                    j = Description3Node.Count - 1;
-                }
-
-                ObservableCollection<EplanNode> PartNrNode = Description3Node[j].SubNode;
-                j = find_index_in_collection(PartNrNode, PartNrName[i]);
-                if (j < 0)
-                {
-                    PartNrNode.Add(new EplanNode() { Name = PartNrName[i], Executor = NoteName[i] });
-                    j = PartNrNode.Count - 1;
+                    PartNrNode.Add(new EplanNode() { ParentNode = Description3Node[ParentIndex], Name = PartNrName[i], Note = NoteName[i] });
+                    index = PartNrNode.Count - 1;
                 }
             }
 
             //переименовываем элементы из столбца и сортируем по алфавиту названия из столбца supplier
-            foreach (var node in Project)
+           /* foreach (var node in ProductTopGroupNode)
             {
-                if (node.Name == "1")
+                if (node.OriginName == "1")
                 {
                     node.Name = "Электротехника";
                 }
-                else if (node.Name == "2")
+                else if (node.OriginName == "2")
                 {
                     node.Name = "Fluid - техника";
                 }
-                else if (node.Name == "3")
+                else if (node.OriginName == "3")
                 {
                     node.Name = "Механика";
                 }
-
-                node.SubNode = new ObservableCollection<EplanNode>(node.SubNode.OrderBy(i => i.Name));
-            }
+           
+                //          node.SubNode = new ObservableCollection<EplanNode>(node.SubNode.OrderBy(i => i.Name));
+            }*/
 
             #region Старые циклы)
             // for (int i = 0; i < ProductTopGroupName.Count; i++)
             // {
-            //     ProductTopGroupNode.Add(new EplanNode() { Name = ProductTopGroupName[i].ToString(), SubNode = new ObservableCollection<EplanBaseNode>() });
+            //     ProductTopGroupNode.Add(new EplanNode() { Name = ProductTopGroupName[i].ToString(), SubNode = new ObservableCollection<EplanNodeBase>() });
             //     SupplierName = seq.Where(s => s.Field<short>("producttopgroup") == ProductTopGroupName[i]).Select(s => s.Field<string>("supplier")).Distinct().ToList();
 
-            //     for (int j = 0; j < SupplierName.Count; j++)
+            //     for (int index = 0; index < SupplierName.Count; index++)
             //     {
-            //         SupplierNode.Add(new EplanNode() { Name = SupplierName[j], SubNode = new ObservableCollection<EplanBaseNode>() });
-            //         var jj = SupplierNode[SupplierNode.IndexOf(SupplierNode.Last(x => x.Name == SupplierName[j]))];
+            //         SupplierNode.Add(new EplanNode() { Name = SupplierName[index], SubNode = new ObservableCollection<EplanNodeBase>() });
+            //         var jj = SupplierNode[SupplierNode.IndexOf(SupplierNode.Last(x => x.Name == SupplierName[index]))];
             //         ProductTopGroupNode[i].SubNode.Add(jj);
-            //         // ProductTopGroupNode[i].Tasks.Add(SupplierNode[j]);
+            //         // ProductTopGroupNode[i].Tasks.Add(SupplierNode[index]);
             //         ProductGroupName = seq.Where(s => (s.Field<short>("producttopgroup") == ProductTopGroupName[i]) &&
-            //                                           (s.Field<string>("supplier") == SupplierName[j])).Select(s => s.Field<short>("productgroup")).Distinct().ToList();
+            //                                           (s.Field<string>("supplier") == SupplierName[index])).Select(s => s.Field<short>("productgroup")).Distinct().ToList();
 
             //         for (int k = 0; k < ProductGroupName.Count; k++)
             //         {
-            //             ProductGroupNode.Add(new EplanNode() { Name = ProductGroupName[k].ToString(), SubNode = new ObservableCollection<EplanBaseNode>() });
+            //             ProductGroupNode.Add(new EplanNode() { Name = ProductGroupName[k].ToString(), SubNode = new ObservableCollection<EplanNodeBase>() });
             //             var kk = ProductGroupNode[ProductGroupNode.IndexOf(ProductGroupNode.Last(x => x.OriginName == ProductGroupName[k].ToString()))];
             //             jj.SubNode.Add(kk);
-            //             //SupplierNode[j].Tasks.Add(ProductGroupNode[ProductGroupNode.IndexOf(ProductGroupNode.First(x => x.Name == ProductGroupName[k].ToString()))]);
+            //             //SupplierNode[index].Tasks.Add(ProductGroupNode[ProductGroupNode.IndexOf(ProductGroupNode.First(x => x.Name == ProductGroupName[k].ToString()))]);
 
             //             TypeNrName = seq.Where(s => (s.Field<short>("producttopgroup") == ProductTopGroupName[i]) &&
-            //                                         (s.Field<string>("supplier") == SupplierName[j]) &&
+            //                                         (s.Field<string>("supplier") == SupplierName[index]) &&
             //                                         (s.Field<short>("productgroup") == ProductGroupName[k])).Select(s => s.Field<string>("typenr")).Distinct().ToList();
 
             //             for (int l = 0; l < TypeNrName.Count; l++)
             //             {
-            //                 TypeNrNode.Add(new EplanNode() { Name = TypeNrName[l], SubNode = new ObservableCollection<EplanBaseNode>() });
+            //                 TypeNrNode.Add(new EplanNode() { Name = TypeNrName[l], SubNode = new ObservableCollection<EplanNodeBase>() });
             //                 var ll = TypeNrNode[TypeNrNode.IndexOf(TypeNrNode.Last(x => x.Name == TypeNrName[l]))];
             //                 //ProductGroupNode[kk].Tasks.Add(TypeNrNode[TypeNrNode.IndexOf(TypeNrNode.First(x => x.Name == TypeNrName[l]))]);
             //                 kk.SubNode.Add(ll);
 
             //                 Description1Name = seq.Where(s => (s.Field<short>("producttopgroup") == ProductTopGroupName[i]) &&
-            //                                                   (s.Field<string>("supplier") == SupplierName[j]) &&
+            //                                                   (s.Field<string>("supplier") == SupplierName[index]) &&
             //                                                   (s.Field<short>("productgroup") == ProductGroupName[k]) &&
             //                                                   (s.Field<string>("typenr") == TypeNrName[l])).Select(s => s.Field<string>("description1")).Distinct().ToList();
 
             //                 for (int m = 0; m < Description1Name.Count; m++)
             //                 {
-            //                     Description1Node.Add(new EplanNode() { Name = Description1Name[m], SubNode = new ObservableCollection<EplanBaseNode>() });
+            //                     Description1Node.Add(new EplanNode() { Name = Description1Name[m], SubNode = new ObservableCollection<EplanNodeBase>() });
             //                     var mm = Description1Node[Description1Node.IndexOf(Description1Node.Last(x => x.Name == Description1Name[m]))];
             //                     //TypeNrNode[l].Tasks.Add(Description3Node[Description3Node.IndexOf(Description3Node.First(x => x.Name == Description3Name[m]))]);
             //                     ll.SubNode.Add(mm);
 
             //                     Description2Name = seq.Where(s => (s.Field<short>("producttopgroup") == ProductTopGroupName[i]) &&
-            //                                                       (s.Field<string>("supplier") == SupplierName[j]) &&
+            //                                                       (s.Field<string>("supplier") == SupplierName[index]) &&
             //                                                       (s.Field<short>("productgroup") == ProductGroupName[k]) &&
             //                                                       (s.Field<string>("typenr") == TypeNrName[l]) &&
             //                                                       (s.Field<string>("description1") == Description1Name[m])).Select(s => s.Field<string>("description2")).Distinct().ToList();
 
             //                     for (int n = 0; n < Description2Name.Count; n++)
             //                     {
-            //                         Description2Node.Add(new EplanNode() { Name = Description2Name[n], SubNode = new ObservableCollection<EplanBaseNode>() });
+            //                         Description2Node.Add(new EplanNode() { Name = Description2Name[n], SubNode = new ObservableCollection<EplanNodeBase>() });
             //                         var nn = Description2Node[Description2Node.IndexOf(Description2Node.Last(x => x.Name == Description2Name[n]))];
             //                         mm.SubNode.Add(nn);
 
             //                         //Description3Node[m].Tasks.Add(Description2Node[Description2Node.IndexOf(Description2Node.First(x => x.Name == Description2Name[n]))]);
             //                         Description3Name = seq.Where(s => (s.Field<short>("producttopgroup") == ProductTopGroupName[i]) &&
-            //                                                           (s.Field<string>("supplier") == SupplierName[j]) &&
+            //                                                           (s.Field<string>("supplier") == SupplierName[index]) &&
             //                                                           (s.Field<short>("productgroup") == ProductGroupName[k]) &&
             //                                                           (s.Field<string>("typenr") == TypeNrName[l]) &&
             //                                                           (s.Field<string>("description1") == Description1Name[m]) &&
@@ -586,13 +762,13 @@ namespace ChildNodesPathDemo
 
             //                         for (int o = 0; o < Description3Name.Count; o++)
             //                         {
-            //                             Description3Node.Add(new EplanNode() { Name = Description3Name[o], SubNode = new ObservableCollection<EplanBaseNode>() });
+            //                             Description3Node.Add(new EplanNode() { Name = Description3Name[o], SubNode = new ObservableCollection<EplanNodeBase>() });
             //                             var oo = Description3Node[Description3Node.IndexOf(Description3Node.Last(x => x.Name == Description3Name[o]))];
             //                             nn.SubNode.Add(oo);
 
             //                             //Description2Node[n].Tasks.Add(Description1Node[Description1Node.IndexOf(Description1Node.First(x => x.Name == Description1Name[o]))]);
             //                             PartNrName = seq.Where(s => (s.Field<short>("producttopgroup") == ProductTopGroupName[i]) &&
-            //                                                               (s.Field<string>("supplier") == SupplierName[j]) &&
+            //                                                               (s.Field<string>("supplier") == SupplierName[index]) &&
             //                                                               (s.Field<short>("productgroup") == ProductGroupName[k]) &&
             //                                                               (s.Field<string>("typenr") == TypeNrName[l]) &&
             //                                                               (s.Field<string>("description1") == Description1Name[m]) &&

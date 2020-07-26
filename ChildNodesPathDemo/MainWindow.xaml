@@ -53,7 +53,7 @@
 
             </dxg:TreeListControl.View>
             <dxg:TreeListColumn FieldName="Name" AllowSorting="True" />
-            <dxg:TreeListColumn FieldName="Executor" AllowSorting="True" />
+            <dxg:TreeListColumn FieldName="Note" AllowSorting="True" />
             <dxg:TreeListColumn FieldName="WHD" AllowSorting="True" />
 
 
@@ -86,7 +86,7 @@
             </dxg:TreeListControl.View>
 
             <dxg:TreeListColumn FieldName="Name" AllowSorting="True"/>
-            <dxg:TreeListColumn FieldName="Executor" AllowSorting="True"/>
+            <dxg:TreeListColumn FieldName="Note" AllowSorting="True"/>
             <!--<dxg:TreeListColumn.CellTemplate>
                     <DataTemplate>
                         <ComboBox x:Name="Boxxx" >
