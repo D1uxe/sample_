@@ -376,7 +376,7 @@ namespace ChildNodesPathDemo
         {
 
             EplanNode result2 = DataItems.Flatten(i => i.SubNode).
-                                          FirstOrDefault(i => i.NodeId == ((EplanNode)SelectedNode2?.Content)?.NodeId);
+                                          FirstOrDefault(i => i.NodeId == ((EplanNode)SelectedNode2?.Content)?.NodeId); //приводим SelectedNode2?.Content к EplanNode. А не SelectedNode2 к EplanNode как может показаться. В свойстве Сontent лежит объект EplanNode
 
             return result2.NodeId.ToString();
 
